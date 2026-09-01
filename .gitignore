@@ -35,3 +35,6 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# ===================== WorkBuddy 内部目录（隐私，不入库）=====================
+.workbuddy/

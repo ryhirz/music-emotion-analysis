@@ -1,3 +1,14 @@
+---
+title: MusicEmotion AI
+emoji: 🎵
+colorFrom: blue
+colorTo: indigo
+sdk: gradio
+sdk_version: "5.50.0"
+app_file: app.py
+pinned: false
+---
+
 # 🎵 MusicEmotion AI · 音乐情感分析工具
 
 ![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)

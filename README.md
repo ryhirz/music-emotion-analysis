@@ -15,6 +15,7 @@ pinned: false
 ![Gradio](https://img.shields.io/badge/Gradio-5.50-FF7A00?logo=gradio&logoColor=white)
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-1.5.2-F7931E?logo=scikit-learn&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-blue)
+[![CI](https://github.com/ryhirz/music-emotion-analysis/actions/workflows/ci.yml/badge.svg)](https://github.com/ryhirz/music-emotion-analysis/actions/workflows/ci.yml)
 
 > 基于 **GTZAN 数据集** 与 **SVM** 的音乐情感分析工具：上传一段音频，自动提取 **37 维声学特征**，预测 **6 类情感标签**（活力 / 激昂 / 平静 / 欢快 / 忧郁 / 律动）。
 

@@ -17,13 +17,15 @@ jobs:
         with:
           python-version: "3.13"
 
-      # 依赖版本已在 requirements.txt 中锁死（numpy/numba/scipy/librosa 互相敏感，
-      # 且 Python 3.13 需 standard-aifc / standard-sunau 补齐已移除的标准库模块）。
-      - name: 安装依赖
+      # 依赖从锁文件 requirements.txt 安装，并强制校验 sha256。
+      # 锁文件由 .github/workflows/lockfiles.yml 在同样的 Ubuntu + Python 3.13 上生成，
+      # 每个传递依赖（含 numpy/numba/scipy/librosa 这组互相敏感的包）都被钉死版本 + 哈希，
+      # 因此不会再出现「本地好好的、CI 全新安装装到新版本就挂」的情况。
+      # 测试依赖 pytest 已包含在锁文件内，无需单独安装。
+      - name: 安装依赖（从锁文件，强制校验哈希）
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
+          pip install --require-hashes -r requirements.txt
 
       # 语法层面把关：所有脚本必须能通过字节码编译
       - name: 语法编译检查

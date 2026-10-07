@@ -82,3 +82,11 @@ gradio==5.50.0
 #   本机通常没装系统级 ffmpeg，装这个包后 predict.py 会在运行时把它的
 #   ffmpeg 注入 PATH，从而"装好即用"地支持 mp3（无需你手动安装 ffmpeg）。
 imageio-ffmpeg==0.6.0
+
+
+# ---------- 7. 测试工具 ----------
+# 并入锁文件的原因：CI 用 `pip install --require-hashes -r requirements.txt` 安装，
+# 该模式要求"每一个被安装的包都出现在锁文件里且带哈希"。
+# 若 pytest 不进锁文件，就不能再用 -r 一起装，只能另起一条无哈希的安装命令，
+# 那样既失去可复现性、又多了两处要同步的清单。
+pytest

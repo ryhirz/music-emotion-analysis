@@ -131,7 +131,7 @@ python scripts/train_model.py              # 训练三模型 → models/*.joblib
 ## 📁 目录结构
 
 ```
-MusicEmotion-AI/
+music-emotion-analysis/
 ├── app.py                      # Gradio 交互界面入口
 ├── requirements.txt            # 依赖清单（版本已锁定，便于复现）
 ├── README.md

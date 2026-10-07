@@ -53,10 +53,10 @@ git init
 git add .
 git commit -m "Initial commit: MusicEmotion AI — 音乐情感分析工具"
 
-# 关联远程（把 <你的用户名> 换成实际 GitHub 用户名）
-git branch -M main
-git remote add origin git@github.com:<你的用户名>/MusicEmotion-AI.git
-git push -u origin main
+# 关联远程（本仓库实际地址）
+git branch -M master
+git remote add origin git@github.com:ryhirz/music-emotion-analysis.git
+git push -u origin master
 ```
 
 > `git add .` 会**自动遵守 `.gitignore`**，不会把 `.venv` 和 1.3GB 原始音频带进去。推送前可用 `git status` 复查待提交文件清单。
@@ -70,7 +70,7 @@ git push -u origin main
 1. 登录 [huggingface.co](https://huggingface.co)，右上角 **New Space**；
 2. **SDK** 选择 **Gradio**；
 3. **Hardware** 选择 **Free（CPU）tier**；
-4. Space 名称填 `MusicEmotion-AI`，可见性选 `Public`（简历展示建议 Public）；
+4. Space 名称填 `music-emotion-analysis`，可见性选 `Public`（简历展示建议 Public）；
 5. 创建后即可获得该 Space 的 Git 仓库地址。
 
 ### 2.2 代码适配（已完成 ✅）
@@ -119,7 +119,7 @@ git add .
 git commit -m "Deploy MusicEmotion AI to HF Spaces"
 
 git branch -M main
-git remote add space https://huggingface.co/spaces/<你的用户名>/MusicEmotion-AI
+git remote add space https://huggingface.co/spaces/<你的用户名>/music-emotion-analysis
 git push -u space main
 ```
 

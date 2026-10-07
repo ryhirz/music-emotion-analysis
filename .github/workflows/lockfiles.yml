@@ -1,0 +1,66 @@
+# 依赖锁文件自动维护（pip-compile）
+# ============================================================================
+# requirements.in  = 人写的抽象规格
+# requirements.txt = 机器编译的锁文件（钉死版本 + sha256 哈希）
+#
+# 必须在 Ubuntu 上编译：pip-compile 解析的是当前平台的依赖图，
+# 生成环境必须与 CI 消费环境（ubuntu-latest + Python 3.13）一致，
+# 否则锁文件里可能有平台专属的 wheel 哈希对不上，或漏掉平台专属依赖。
+#
+# ⚠️ 关于「一个锁只能服务一个 Python 大版本」：
+#   本仓库的注释里写了「Python 3.11 用户请把 numpy/scipy/numba 换成备用版本」。
+#   那套 3.11 组合无法与 3.13 的依赖（standard-aifc / standard-sunau 等）
+#   共存于同一份锁文件里。本锁文件**以 CI 实际使用的 Python 3.13 为准**，
+#   3.11 使用者请继续按 requirements.in 里的注释手动替换（属已知取舍）。
+#
+# --strip-extras 说明：--require-hashes 要求每个被安装的包都带哈希出现在文件里；
+# 保留 extras 写法会让 pip 去装未被钉住的 extras 依赖而报错。
+#
+# 触发：Actions 页面手动 Run workflow，或每周一自动刷新。
+# ============================================================================
+name: Lockfiles
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * 1" # 每周一 02:00 UTC（北京时间 10:00）自动刷新
+
+permissions:
+  contents: write
+
+jobs:
+  lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13" # 必须与 ci.yml 的 python-version 一致
+
+      - name: 安装 pip-tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-tools
+          pip-compile --version
+
+      - name: 编译锁文件（钉死版本 + sha256 哈希）
+        run: |
+          set -euo pipefail
+          pip-compile --generate-hashes --strip-extras \
+            --output-file requirements.txt requirements.in
+          echo "----- 产物概览 -----"
+          grep -c -- '--hash=' requirements.txt | sed 's/^/带哈希的依赖行数: /'
+
+      - name: 有变化才提交
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "锁文件无变化，跳过提交"
+          else
+            git commit -m "chore(deps): 刷新 pip-compile 锁文件"
+            git push
+          fi

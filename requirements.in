@@ -1,0 +1,84 @@
+# =====================================================================
+# 音乐情感分析工具 · Python 依赖清单
+# =====================================================================
+#
+# 【适用环境】
+#   Python 版本：3.13.x（已在 Windows 11 实测通过全部安装 + 导入）
+#   （若你用 Python 3.11，把下面 numpy/numba/scipy 换成注释里的备用版本即可）
+#
+# 【安装方式】
+#   国内推荐用清华镜像，速度快 10 倍以上：
+#       pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+#
+# 【为什么版本号要"锁死"】
+#   音频这条链上 numba / numpy / scipy / librosa 互相依赖非常敏感，
+#   numpy 2.x 和 librosa 0.10 早期版本会直接冲突。锁死版本 = 避免
+#   "我明明按教程装的，为什么跑不起来" 这种最浪费时间的坑。
+#   ⚠ 不要随意升级这些包，要升级就整组一起升。
+# =====================================================================
+
+
+# ---------- 1. 数值计算基础层 ----------
+# numpy: 所有数组的底座
+# scipy: librosa 依赖它做信号处理
+# numba: librosa 的重采样功能靠它加速（也是最容易出兼容问题的包）
+numpy==2.1.3
+scipy==1.14.1
+numba==0.61.0
+#   ↑ Python 3.11 用户改用这套：numpy==1.26.4  scipy==1.11.4  numba==0.59.1
+
+
+# ---------- 1.5 Python 3.13 专用补丁包（重要！）----------
+# ⚠ 坑点说明：Python 3.13 把 aifc / sunau 等模块从标准库里删掉了（PEP 594）。
+#   而 librosa.load() 内部会调用 audioread.available_backends()，
+#   该函数会 import aifc —— 结果就是：在 Python 3.13 上不装这两个包，
+#   librosa.load() 对【所有音频格式】都会报 ModuleNotFoundError: No module named 'aifc'。
+#   这是本项目实测踩到的真实坑，必装。
+#
+#   Python 3.11 / 3.12 用户不需要这两个包（标准库里还有），装了也无害。
+standard-aifc==3.13.0
+standard-sunau==3.13.0
+
+
+# ---------- 2. 音频处理层 ----------
+# librosa:   音频特征提取的主力库（本项目的核心）
+# soundfile: 读写 wav/flac/au 的底层库，librosa 靠它读文件
+# audioread: 读 mp3 的兜底后端（需要系统已装 ffmpeg）
+# pydub:     万能音频格式转换（mp3 ↔ wav 互转时会用到）
+librosa==0.10.2.post1
+soundfile==0.13.1
+audioread==3.0.1
+pydub==0.25.1
+
+
+# ---------- 3. 机器学习层 ----------
+# scikit-learn: 分类模型（RandomForest）+ 数据切分 + 评估指标
+# joblib:       训练好的模型保存/加载（.pkl 文件）
+scikit-learn==1.5.2
+joblib==1.4.2
+
+
+# ---------- 4. 数据处理与可视化 ----------
+# pandas:    特征表格处理（你已熟悉）
+# matplotlib: 画混淆矩阵、特征分布图
+# tqdm:      循环进度条，跑 1000 个文件时能看清进度
+pandas==2.2.3
+matplotlib==3.10.0
+tqdm==4.67.1
+
+
+# ---------- 5. 工程工具类 ----------
+# requests: 下载脚本用的 HTTP 库
+requests==2.32.3
+
+
+# ---------- 6. 界面层（做 Web 界面阶段再装，可先跳过）----------
+# gradio: 纯 Python 写网页界面，零前端基础也能做出可交互页面
+# 说明：这个包依赖较多（fastapi/uvicorn/pydantic 等），安装约 1-2 分钟。
+#       第一阶段（环境搭建 + 数据准备）不需要它，可以等做到界面那步再装：
+#           pip install gradio==5.50.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
+gradio==5.50.0
+# imageio-ffmpeg: 自带静态 ffmpeg 二进制。librosa 读 mp3 依赖 ffmpeg，
+#   本机通常没装系统级 ffmpeg，装这个包后 predict.py 会在运行时把它的
+#   ffmpeg 注入 PATH，从而"装好即用"地支持 mp3（无需你手动安装 ffmpeg）。
+imageio-ffmpeg==0.6.0

@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # 依赖版本已在 requirements.txt 中锁死（numpy/numba/scipy/librosa 互相敏感，
+      # 且 Python 3.13 需 standard-aifc / standard-sunau 补齐已移除的标准库模块）。
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      # 语法层面把关：所有脚本必须能通过字节码编译
+      - name: 语法编译检查
+        run: python -m compileall -q app.py scripts tests
+
+      # 冒烟测试：映射表一致性 / 标注函数行为 / 特征维度与模型产物一致
+      # 刻意不依赖音频文件与 librosa，因此无需下载 GTZAN 即可稳定复现
+      - name: 运行冒烟测试
+        run: python -m pytest tests -q
+
+      # 说明：GTZAN 原始音频约 1.3GB（.gitignore 已排除），CI 不下载数据集，
+      # 因此特征提取与训练的端到端链路不在本流水线覆盖范围内。
